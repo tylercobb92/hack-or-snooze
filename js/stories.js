@@ -88,3 +88,33 @@ async function submitNewStory(e) {
 }
 
 $submitForm.on('submit', submitNewStory);
+
+async function toggleFavorite(e) {
+  const $target = $(e.target);
+  const $closestLi = $target.closest('li');
+  const storyId = $closestLi.attr('id');
+  const story = storyList.stories.find(s => s.storyId === storyId);
+
+  if ($target.hasClass("fas")) {
+    await currentUser.removeFavorite(story);
+    $target.closest('i').toggleClass("fas far");
+  } else {
+    await currentUser.addFavorite(story);
+    $target.closest("i").toggleClass("fas far")
+  }
+}
+
+$storiesLists.on('click', '.star', toggleFavorite);
+
+function showFavoritesList() {
+  $favoritedStories.empty();
+
+  if (currentUser.favorites.length === 0) {
+    $favoritedStories.append("<h5>No stories have been favorited!</h5>");
+  } else {
+    for (let story of currentUser.favorites) {
+      const $story = generateStoryMarkup(story);
+      $favoritedStories.show();
+    }
+  }
+}

@@ -19,7 +19,7 @@ async function getAndShowStoriesOnStart() {
  * Returns the markup for the story.
  */
 
-function generateStoryMarkup(story) {
+function generateStoryMarkup(story, showTrashCan = false) {
   // console.debug("generateStoryMarkup", story);
 
   const hostName = story.getHostName();
@@ -28,6 +28,7 @@ function generateStoryMarkup(story) {
 
   return $(`
       <li id="${story.storyId}">
+        ${showTrashCan ? getTrashCan() : ""}
         ${showStar ? getStar(story, currentUser) : ""}
         <a href="${story.url}" target="a_blank" class="story-link">
           ${story.title}
@@ -45,10 +46,17 @@ function getStar(story, user) {
   const isFavorite = user.isFavorite(story);
   const starType = isFavorite ? "fas" : "far";
   return `
-    <span class='star'>
-      <i class='${starType} fa-star'></i>
-    </span>
-  `
+      <span class="trash-can">
+        <i class="fas fa-trash-alt"></i>
+      </span>`;
+}
+
+// add trash can icon for delete story button
+function getTrashCan() {
+  return `
+  <span class="trash-can">
+    <i class="fas fa-trash-alt"></i>
+  </span>`;
 }
 
 
@@ -120,3 +128,29 @@ function showFavoritesList() {
 
   $favoritedStories.show();
 }
+
+function putUserStoriesOnPage() {
+  $ownStories.empty();
+
+  if (currentUser.ownStories.length === 0) {
+    $ownStories.append("<h5>You haven't added any stories yet!</h5>")
+  } else {
+    for (let story of currentUser.ownStories) {
+      let $story = generateStoryMarkup(story, true);
+      $ownStories.append($story);
+    }
+  }
+
+  $ownStories.show();
+}
+
+async function deleteStory(e) {
+  const $closestLi = $(e.target).closest('li');
+  const storyId = $closestLi.attr('id');
+
+  await storyList.removeStory(currentUser, storyId);
+
+  await showOwnStories();
+}
+
+$ownStories.on('click', ".trash-can", deleteStory);

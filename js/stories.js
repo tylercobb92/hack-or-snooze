@@ -47,7 +47,7 @@ function getStar(story, user) {
   const starType = isFavorite ? "fas" : "far";
   return `
       <span class="trash-can">
-        <i class="fas fa-trash-alt"></i>
+        <i class="${starType} fa-star"></i>
       </span>`;
 }
 
@@ -97,6 +97,7 @@ async function submitNewStory(e) {
 
 $submitForm.on('submit', submitNewStory);
 
+// toggle favorite
 async function toggleFavorite(e) {
   const $target = $(e.target);
   const $closestLi = $target.closest('li');
@@ -112,8 +113,21 @@ async function toggleFavorite(e) {
   }
 }
 
-$storiesLists.on('click', '.star', toggleFavorite);
+$storiesLists.on('click', '.fa-star', toggleFavorite);
 
+// delete story
+async function deleteStory(e) {
+  const $closestLi = $(e.target).closest('li');
+  const storyId = $closestLi.attr('id');
+
+  await storyList.removeStory(currentUser, storyId);
+
+  await putUserStoriesOnPage();
+}
+
+$ownStories.on('click', ".trash-can", deleteStory);
+
+// show only favorited stories
 function showFavoritesList() {
   $favoritedStories.empty();
 
@@ -129,6 +143,7 @@ function showFavoritesList() {
   $favoritedStories.show();
 }
 
+// show only stories submitted by current user
 function putUserStoriesOnPage() {
   $ownStories.empty();
 
@@ -144,13 +159,3 @@ function putUserStoriesOnPage() {
   $ownStories.show();
 }
 
-async function deleteStory(e) {
-  const $closestLi = $(e.target).closest('li');
-  const storyId = $closestLi.attr('id');
-
-  await storyList.removeStory(currentUser, storyId);
-
-  await putUserStoriesOnPage();
-}
-
-$ownStories.on('click', ".trash-can", deleteStory);

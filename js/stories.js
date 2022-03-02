@@ -114,7 +114,9 @@ function showFavoritesList() {
   } else {
     for (let story of currentUser.favorites) {
       const $story = generateStoryMarkup(story);
-      $favoritedStories.show();
+      $favoritedStories.append($story);
     }
   }
+
+  $favoritedStories.show();
 }

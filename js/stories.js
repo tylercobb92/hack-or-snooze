@@ -28,7 +28,7 @@ function generateStoryMarkup(story, showTrashCan = false) {
 
   return $(`
       <li id="${story.storyId}">
-        ${showTrashCan ? getTrashCan() : ""}
+        ${showTrashCan ? getDeleteBtn() : ""}
         ${showStar ? getStar(story, currentUser) : ""}
         <a href="${story.url}" target="a_blank" class="story-link">
           ${story.title}
@@ -52,7 +52,7 @@ function getStar(story, user) {
 }
 
 // add trash can icon for delete story button
-function getTrashCan() {
+function getDeleteBtn() {
   return `
   <span class="trash-can">
     <i class="fas fa-trash-alt"></i>
@@ -150,7 +150,7 @@ async function deleteStory(e) {
 
   await storyList.removeStory(currentUser, storyId);
 
-  await showOwnStories();
+  await putUserStoriesOnPage();
 }
 
 $ownStories.on('click', ".trash-can", deleteStory);
